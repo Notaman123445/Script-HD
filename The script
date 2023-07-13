@@ -1,0 +1,230 @@
+local commandEvent = game.ReplicatedStorage.CommandEvent --Made by NOTAMAN123445      Roblox         Admin commands
+local datastore = game:GetService("DataStoreService") --data store service
+local Bandata = datastore:GetDataStore("BanInfo") --ban datastore
+local Warndata = datastore:GetDataStore("WarnInfo")--warn datastore
+local HttpService = game:GetService("HttpService") --The Http Service
+local follower1000Tag = game.ReplicatedStorage.Followers1000
+local follower10000Tag = game.ReplicatedStorage.Followers10000
+local follower100000Tag = game.ReplicatedStorage.Followers100000
+local nofollowerchattag = game.ReplicatedStorage.NoChatTagFollowers
+game.Players.PlayerAdded:Connect(function(player) -- player joined
+	local leaderstats = Instance.new("Folder") --makes a leaderstats folder
+	leaderstats.Name = "leaderstats"
+	leaderstats.Parent = player
+	local cash = Instance.new("IntValue") --makes cash intvalue
+	cash.Name = "Cash"
+	cash.Parent = leaderstats
+	local level = Instance.new("IntValue") --makes level intvalue
+	level.Name = "Level"
+	level.Parent = leaderstats
+	local rebirths = Instance.new("IntValue") --makes rebirth intvalue
+	rebirths.Name = "Rebirths"
+	rebirths.Parent = leaderstats
+	local diamonds = Instance.new("IntValue") --makes diamond intvalue
+	diamonds.Name = "Diamonds"
+	diamonds.Parent = leaderstats
+	local rubys = Instance.new("IntValue") --makes ruby intvalue
+	rubys.Name = "Rubys"
+	rubys.Parent = leaderstats
+	local points = Instance.new("IntValue")
+	points.Name = "Points"
+	points.Parent = leaderstats
+	local data = Bandata:GetAsync(player.UserId) --gets players banData
+	if data then --checks if the player has data
+		if data == 1 then-- checks if player is banned
+			player:Kick("You are still BANNED! Get out of this game!") --kicks them if they are banned
+		end		
+	end
+	local UserId = player.UserId --players userid
+	local Table = "https://friends.roproxy.com/v1/users/"..UserId.."/followers/count" -- api url
+	local response = HttpService:RequestAsync({    
+		Url = Table,
+		Method = "GET"
+	});
+	if response.Success then -- checks if response is successfull
+		local TableBody = HttpService:JSONDecode(response.Body)--gets the follower count
+		if TableBody.count > 99999 then follower100000Tag:FireClient(player) -- checks  if the player has more than 99999 followers
+		elseif TableBody.count > 9999 then follower10000Tag:FireClient(player) -- checks  if the player has more than 9999
+		elseif TableBody.count > 999 then follower1000Tag:FireClient(player)-- checks  if the player has more than 999
+		else nofollowerchattag:FireClient(player) end--event fires if the player has less than 1000 followers
+	end
+end)
+local function setcash_player (person, number)--SetCash command
+	game.Players:FindFirstChild(person).leaderstats.Cash.Value = number --sets leaderstats
+end
+local function loopkill_player (person, amount)--loopkill command
+	local max = amount
+	local total = 0
+	repeat
+		game.Players:FindFirstChild(person).Character.Humanoid.Health = -10
+		total += 1
+		wait(5)
+	until total == max
+end
+local function ban_player (person)-- bans the player
+	local player = game.Players:FindFirstChild(person)
+	player:Kick("You have been banned")
+	Bandata:SetAsync(player.UserId, 1)
+end 
+local function unban_player (id) --unbans the player (Must use UserId) get the userid from roblox profile
+	Bandata:SetAsync(id, 0)
+end
+local function infhealth_player (person)--infhealth command
+	game.Players:FindFirstChild(person).Character.Humanoid.MaxHealth = 1000000000000
+	game.Players:FindFirstChild(person).Character.Humanoid.Health = 1000000000000
+end
+local function setrebirths (person, number)--setrebirths command
+	game.Players:FindFirstChild(person).leaderstats.Rebirths.Value = number
+end
+local function setlevel (person, number)--setlevel command
+	game.Players:FindFirstChild(person).leaderstats.Level.Value = number
+end
+local function setdiamonds (person, number)--setdiamonds command
+	game.Players:FindFirstChild(person).leaderstats.Diamonds.Value = number
+end
+local function setrubys (person, number)--setRubys command
+	game.Players:FindFirstChild(person).leaderstats.Rubys.Value = number
+end
+local function npc_player (person)--npc command
+	game.Players:FindFirstChild(person).Character.Humanoid:MoveTo(Vector3.new(10, 3,10))
+	wait(5)
+	game.Players:FindFirstChild(person).Character.Humanoid:MoveTo(Vector3.new(-100, 3, -200))
+end
+local function blind_player (person)--blind command
+	game.Players:FindFirstChild(person).PlayerGui.Blind.Frame.Visible = true
+end
+local function nuke_player (person)--Nuke comamnd
+	game.Players:FindFirstChild(person).Character.Humanoid.Health = 0
+	wait(3)
+	game.Players:FindFirstChild(person):Kick("You were kicked becuase admin nuked you")
+end
+local function Btool_player (person) --Building tool command
+	local Btool = game.ServerStorage["Building Tools"]
+	local clone = Btool:Clone()
+	clone.Parent = game.Players:FindFirstChild(person).Backpack
+end
+local function baseplate_command (person)--baseplate command
+	local player = game.Players:FindFirstChild(person)
+	local baseplate = game.Workspace.Baseplate
+	local baseclone = baseplate:Clone()
+	baseclone.Name = "Baseplate2"
+	baseclone.Parent =	game.Workspace
+	baseclone.Position = Vector3.new(0, 100, 0)
+end
+local function kill_player (person)-- kill command
+	game.Players:FindFirstChild(person).Character.Humanoid.Health = 0
+end
+local function tpall_player (person)-- teleports all players to a person
+	for _, v in pairs(game.Players:GetChildren()) do
+		v.Character.HumanoidRootPart.CFrame = game.Players:FindFirstChild(person).Character.HumanoidRootPart.CFrame
+	end
+end
+local function random_command (person)-- random command
+	local ran = math.random(1, 2)
+	if ran == 1 then 
+		kill_player(person) 
+	else 
+		nuke_player(person) 
+	end
+end
+local function farland_player (person)--farland command
+	game.Players:FindFirstChild(person).Character.HumanoidRootPart.CFrame = game.Workspace.FarlandPart.CFrame
+end
+local function unfarland_player (person)--unfarland command
+	game.Players:FindFirstChild(person).Character.HumanoidRootPart.CFrame = game.Workspace.PartBack.CFrame
+end
+local function freeze_player (person)--freeze command
+	game.Players:FindFirstChild(person).Character.Humanoid.WalkSpeed = 0
+	game.Players:FindFirstChild(person).Character.Humanoid.JumpPower = 0
+end
+local function unfreeze_player (person)--unfreeze command    All made by NOTAMAN123445
+	game.Players:FindFirstChild(person).Character.Humanoid.WalkSpeed = 16
+	game.Players:FindFirstChild(person).Character.Humanoid.JumpPower = 50
+end
+local function tool3_player (person)--tool3 command
+	local tool = game.ServerStorage.Tool3
+	local backpack = game.Players:FindFirstChild(person).Backpack
+	local clone = tool:Clone()
+	clone.Name = "Touch to heal"
+	clone.Parent = backpack
+end
+local function tool2_player (person)--tool2  command
+	local tool = game.ServerStorage.Tool2
+	local backpack = game.Players:FindFirstChild(person).Backpack
+	local clone = tool:Clone()
+	clone.Name = "Touch to kill"
+	clone.Parent = backpack
+end
+local function tool_player (person)--tool command
+	local toool = game.ServerStorage.ClassicSword
+	local backpack = game.Players:FindFirstChild(person).Character.Backpack
+	local toolclone = toool:Clone()
+	toolclone.Name = "Sword"
+	toolclone.Parent = backpack
+end
+local function kick_player (person)-- kick command
+	game.Players:FindFirstChild(person):Kick("You have been Kicked by a Admin of this game")
+end
+local function heal_player (person)--healcommand
+	game.Players:FindFirstChild(person).Character.Humanoid.Health = 100
+end
+local function tp_player (person, person2)--tp command
+	game.Players:FindFirstChild(person).Character.HumanoidRootPart.CFrame = game.Players:FindFirstChild(person).Character.HumanoidRootPart.CFrame
+end
+local function warn_player (person) --warn command
+	local data = Warndata:GetAsync(game.Players:FindFirstChild(person).UserId)
+	if data then
+		if data == 1 then 
+			ban_player(person)  --bans the player if they already have a warning
+		else
+			Warndata:SetAsync(game.Players:FindFirstChild(person).UserId, 1)
+		end
+	else
+		Warndata:SetAsync(game.Players:FindFirstChild(person).UserId, 1)
+	end
+	game.Players:FindFirstChild(person).PlayerGui.Warn.Frame.Visible = true
+end
+local function kickall_command (person)-- kick all command (type a name that wont get kicked)
+	for _, v in pairs(game.Players:GetChildren()) do
+		if v.Name ~= person then
+			v:Kick("All Players Have Been Kicked From This Server")
+		end
+	end
+end
+local function invis_player (person)-- invis command      Made by NOTAMAN123445        Roblox
+	for _, limb in pairs(game.Players:FindFirstChild(person).Character:GetChildren()) do		
+		if limb:IsA("BasePart")	then
+			limb.Transparency = 1
+			if limb.Name == "Head" then
+				limb.face.Transparency = 1
+			end
+		elseif limb:IsA("Accessory") then
+			limb.Handle.Transparency = 1
+		end
+	end
+end
+local function pizza_player (person)--pizza command gives player pizza
+	local pizza = game.ServerStorage.Pizza
+	local clone = pizza:Clone()
+	clone.Parent = game.Players:FindFirstChild(person).Backpack
+end
+local function uninvis_player (person)-- uninvis command
+	for _, limb in pairs(game.Players:FindFirstChild(person).Character:GetChildren()) do
+		if limb:IsA("BasePart")	then
+			limb.Transparency = 0
+			if limb.Name == "Head" then
+				limb.face.Transparency = 0
+			elseif limb.Name == "HumanoidRootPart" then
+				limb.Transparency = 1
+			end
+		elseif limb:IsA("Accessory") then
+			limb.Handle.Transparency = 0
+		end		
+	end
+end
+local actions1 = {"/Kill","/Kick", "/Invis", "/Uninvis","/Freeze", "/Unfreeze", "/Heal", "/Tp", "/Farland", "/Unfarland", "/Tool","/Nuke","/Npc","/Random","/Blind","/Setcash", "/Setlevel","/Setdiamonds","/Setrubys","/Setrebirths","/Tool2","/Tool3","/Baseplate","/Loopkill","/Infhealth","/Ban","/Unban","/Btool","/Warn","/Kickall","/Tpall","/Pizza"}
+local actionsfunction = {["/Kill"] = kill_player,["/Kick"] = kick_player,["/Invis"] = invis_player, ["/Uninvis"] = uninvis_player,["/Freeze"] = freeze_player,["/Unfreeze"] = unfreeze_player,["/Heal"] = heal_player,["/Tp"] = tp_player,["/Farland"] = farland_player,["/Unfarland"] = unfarland_player,["/Tool"] = tool_player,["/Nuke"] = nuke_player,["/Npc"] = npc_player,["/Random"] = random_command,["/Blind"] = blind_player,["/Setcash"] = setcash_player,["/Setlevel"] = setlevel,["/Setdiamonds"] = setdiamonds,["/Setrubys"] = setrubys,["/Setrebirths"] = setrebirths,["/Tool2"] = tool2_player,["/Tool3"] = tool3_player,["/Baseplate"] = baseplate_command,["/Loopkill"] = loopkill_player,["/Infhealth"] = infhealth_player,["/Ban"] = ban_player,["/Unban"] = unban_player, ["/Btool"] = Btool_player,["/Warn"] = warn_player, ["/Kickall"] = kickall_command,["/Tpall"] = tpall_player,["/Pizza"] = pizza_player}
+commandEvent.OnServerEvent:Connect(function(notneeded, action, person, person2)
+	if table.find(actions1, action) and game.Players:FindFirstChild(person) then actionsfunction[action](person, person2) end
+end)
+--    Made by NOTAMAN123445                   Roblox
